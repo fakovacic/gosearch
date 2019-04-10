@@ -39,7 +39,6 @@ gosearch -f="{folder}" -l="txt" {text}
 
 ## GUI-GOTRON
 
-<img src="https://raw.githubusercontent.com/FilipAnteKovacic/gosearch/master/docs/gui-search.png" alt="cmd" />
 <img src="https://raw.githubusercontent.com/FilipAnteKovacic/gosearch/master/docs/gui-search_res.png" alt="cmd" />
 
 ### Install
