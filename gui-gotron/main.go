@@ -12,6 +12,7 @@ import (
 	"github.com/Equanox/gotron"
 )
 
+// Search handle search request
 type Search struct {
 	Text   string
 	Folder string
