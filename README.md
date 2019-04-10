@@ -5,6 +5,8 @@ Search text through files in given folder
 
 ## CMD
 
+<img src="https://raw.githubusercontent.com/FilipAnteKovacic/gosearch/master/docs/cmd-search_res.png" alt="cmd" />
+
 ### Install
 
 ```
@@ -37,6 +39,10 @@ gosearch -f="{folder}" -l="txt" {text}
 
 ## GUI-GOTRON
 
+<img src="https://raw.githubusercontent.com/FilipAnteKovacic/gosearch/master/docs/gui-search.png" alt="cmd" />
+<img src="https://raw.githubusercontent.com/FilipAnteKovacic/gosearch/master/docs/gui-search_res.png" alt="cmd" />
+
+### Install
 Install gotron-builder 
 * https://github.com/Equanox/gotron
 
