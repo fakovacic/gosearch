@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>GoSearch</title>
+
+        <!-- Bootstrap core CSS -->
+    <link href="./assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      .searchForm{
+        padding:20px;
+      }
+
+      .loader {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 2s linear infinite;
+      }
+
+      .searchLoader {
+        border: 8px solid #f3f3f3; /* Light grey */
+        border-top: 8px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 2s linear infinite;
+        display: inline-flex;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+    </style>
+
+  </head>
+  <body>
+    <div class="container">
+
+      <div class="row">
+
+        <div class="col-12 col-md-12 col-sm-12 text-center">
+
+          <h2>
+            <img 
+              src="./assets/img/clgtart-gopher.jpg" 
+              alt="clgtart" 
+              width="75" 
+              height="100"
+            > 
+            GoSearch
+          </h2>
+
+        </div>
+
+        <div id="searchForm" class="col-12 col-md-12 col-sm-12 searchForm form-inline">
+          <div class="loader"></div>
+        </div>
+
+        <div id="searching" class="col-12 col-md-12 col-sm-12">
+
+        </div>
+
+        <div id="results" class="col-12 col-md-12 col-sm-12">
+
+        </div>
+
+      </div>
+
+    </div>
+  </body>
+
+<script>
+
+  var searchFromHTML = '<div class="form-row align-items-center">\
+              <div class="col-5 col-md-5 col-sm-12">\
+                <input type="text" class="form-control form-control-lg" id="text" placeholder="Text" value="test" required>\
+              </div>\
+              <div class="col-5 col-md-5 col-sm-12">\
+                <input type="text" class="form-control form-control-lg" id="folder" placeholder="Folder" value="/home/fak/WORK/GO/src/gosearch" required>\
+              </div>\
+              <div class="col-2 col-md-2 col-sm-12">\
+                <button class="btn btn-success btn-lg" id="search" type="button">Search</button>\
+              </div>\
+            </div>';
+
+  function escapeHTML(html) {
+      return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+  }
+
+  function GoSearch(){
+
+      var text    = document.getElementById('text').value
+      var folder  = document.getElementById('folder').value
+
+      ws.send(JSON.stringify({
+          "event" : "search",
+          "text"  : text,
+          "folder": folder,
+      }));
+
+      document.getElementById('searching').innerHTML = '<h3 class="text-center">Searching ' + text + " in " + folder + ' <div class="searchLoader"></div></h3>';
+
+  }
+
+  let ws = new WebSocket("ws://localhost:" + global.backendPort + "/web/app/events");
+
+  setTimeout(
+    function () {
+        if (ws.readyState === 1) {
+
+            document.getElementById('searchForm').innerHTML = searchFromHTML
+      
+            document.getElementById('search').addEventListener("click", GoSearch);
+
+            ws.onmessage = (message) => {
+                let obj = JSON.parse(message.data);
+
+                switch(obj.event){
+                    case "error":
+                      document.getElementById('searching').innerHTML = '<h3 class="text-center text-danger">' + obj.Msg + '</h3>';
+                    break;
+
+                    case "success":
+                      document.getElementById('searching').innerHTML = '<h3 class="text-center text-success">' + obj.Msg + '</h3>'
+                      document.getElementById('results').innerHTML = '<h3 class="text-center"><div class="searchLoader"></div></h3>';
+                    break;
+
+                    case "results":
+
+                      var results = "";
+                      
+                      var resL = obj.Results.length
+
+                      for (resI = 0; resI < resL; ++resI) {
+                          var file = obj.Results[resI];
+
+                          results += '<blockquote class="blockquote">\
+                            <h4 class="mb-0">' + file.Name +' <small>' + file.Path +'</small></h4>';
+
+                            var fileL = file.Lines.length
+                            for (fileI = 0; fileI < fileL; ++fileI) {
+                              var line = file.Lines[fileI];
+
+                              var text = escapeHTML(line.Text);
+                              results += '<footer class="blockquote-footer">'+ line.Line +':<small>' + text + '</small></footer>';
+
+                            }
+                            
+                          results += '</blockquote>';
+
+                      }
+
+                      document.getElementById('results').innerHTML = results
+                    break;
+
+                }
+
+            }
+
+        }
+    }, 5);
+
+</script>
+
+</html>
